@@ -1,0 +1,31 @@
+{
+  "optimal_threshold": 0.0198,
+  "multi_tier_policy": {
+    "low_risk_threshold": 0.0094,
+    "high_risk_threshold": 0.0187,
+    "tiers": {
+      "LOW": "AUTO_APPROVE",
+      "MEDIUM": "MANUAL_REVIEW",
+      "HIGH": "AUTO_FREEZE"
+    }
+  },
+  "metrics_at_optimal_threshold": {
+    "threshold": 0.01984924623115578,
+    "precision": 0.875,
+    "recall": 1.0,
+    "f1": 0.9333333333333333,
+    "f2": 0.9722222222222222,
+    "tp": 49,
+    "fp": 7,
+    "fn": 0,
+    "tn": 694,
+    "total_cost": 210.0,
+    "alert_rate": 0.07466666666666667
+  },
+  "cost_matrix": {
+    "cost_fn": 1000.0,
+    "cost_fp": 30.0,
+    "cost_tp": 0.0,
+    "cost_tn": 0.0
+  }
+}
