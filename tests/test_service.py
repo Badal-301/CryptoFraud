@@ -30,6 +30,14 @@ def test_root_endpoint(client: TestClient):
     data = response.json()
     assert "version" in data
     assert data["model_loaded"] is True
+    assert "dashboard_ui" in data
+
+
+def test_dashboard_endpoint(client: TestClient):
+    response = client.get("/dashboard")
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "CryptoFraud" in response.text
 
 
 def test_health_endpoint(client: TestClient):

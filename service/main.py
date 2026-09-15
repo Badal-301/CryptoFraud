@@ -7,10 +7,14 @@ import time
 from contextlib import asynccontextmanager
 from typing import Any, Dict
 
-from fastapi import FastAPI, HTTPException, status
+from pathlib import Path
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 
 from service.predictor import FraudPredictor
+
+STATIC_DIR = Path(__file__).parent / "static"
 from service.schemas import (
     BatchPredictionResponse,
     BatchTransactionInput,
@@ -82,17 +86,33 @@ def _ensure_predictor_ready():
 
 
 @app.get("/", tags=["General"])
-async def root() -> Dict[str, Any]:
-    """Root metadata and API index."""
+async def root(request: Request) -> Any:
+    """Root metadata and API index. Serves dashboard to browsers, JSON to API clients."""
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept:
+        dashboard_file = STATIC_DIR / "dashboard.html"
+        if dashboard_file.exists():
+            return FileResponse(dashboard_file)
+
     return {
         "service": "Bitcoin Fraud Detection Inference & Explainability API",
         "version": "1.0.0",
+        "dashboard_ui": "/dashboard",
         "docs_url": "/docs",
         "redoc_url": "/redoc",
         "health_check": "/health",
         "model_loaded": predictor.is_loaded,
         "model_name": predictor.meta.get("model_name", "Pending initialization"),
     }
+
+
+@app.get("/dashboard", response_class=HTMLResponse, tags=["Dashboard UI"])
+async def dashboard():
+    """Interactive visual Crypto AML & SHAP Explainability Dashboard."""
+    dashboard_file = STATIC_DIR / "dashboard.html"
+    if not dashboard_file.exists():
+        raise HTTPException(status_code=404, detail="Dashboard template not found.")
+    return FileResponse(dashboard_file)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["General"])
